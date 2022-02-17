@@ -5,7 +5,7 @@ WIP
 ## 配置项
 配置格式是json
 - apikey: 在Nasa申请的apikey, string类型, 在[这里](https://api.nasa.gov/index.html)申请, 只需要(虚假的)名字和邮箱
-- commandStatus: 可选, map<String, boolean>类型, key(第一项) 为API名字的一个(在下面:APOD/EARTH/EPIC/Mars...) 代表这个api是否启用, 比如 `{"EPIC":false}`, `#EPIC 2020-1-1` 就不会有任何作用
+- commandStatus: 可选, map<String, boolean>类型, key(第一项) 为API名字的一个(在下面:APOD/EARTH/EPIC/Mars...) 代表这个api是否启用, 比如 `{"EPIC":false}`, `#EPIC 2020-1-1` 就不会有任何作用(假设EPIC触发的词还是默认的`#EPIC`)
 - commandTets: 可选, map<String, String>类型, key 为api名字的一个, value(第二项)代表触发的字符串, 默认为 `#`加各个API名字, 所以默认就是 `#EPIC 2020-1-1` 就可以触发, 如果在这里设置`{"EPIC": "abc"}`, `abc 2020-1-1`就会触发
 
 ## 目前已经实现的api
@@ -44,7 +44,7 @@ WIP
 
 参数：
 - earth_date: 拍摄时间, yyyy-MM-dd
-- \<camera\>: 相机名字 FHAZ, RHAZ, MAST, CHEMCAM, MAHLI, MARDI, NAVCAM, PANCAM, MINITES, [对应含义](https://api.nasa.gov/index.html#:~:text=named%20as%20follows%3A-,Rover%20Cameras,-Abbreviation)
+- \<camera\>: 可选, 相机名字 FHAZ, RHAZ, MAST, CHEMCAM, MAHLI, MARDI, NAVCAM, PANCAM, MINITES, [对应含义](https://api.nasa.gov/index.html#:~:text=named%20as%20follows%3A-,Rover%20Cameras,-Abbreviation)
 
 ## license
 ```

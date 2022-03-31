@@ -8,13 +8,23 @@ WIP
 {
   "apikey": "<apikey>",
   "commandName": {
-    "EPIC": "#EPIC" // 改EPIC API 的触发字符串到 #EPIC
+    "EPIC": "#EPIC",
+    // 改EPIC API 的触发字符串到 #EPIC
+    "APOD": "555"
   },
   "commandStatus": {
-    "EPIC": false // 弃用EPIC API 默认全部启用
-  }
+    "EPIC": false
+    // 弃用EPIC API(不会回应EPIC命令), 默认全部启用
+  },
+  "enableGroup": true,
+  // 可选, 开启群聊回复, 默认为 false
+  "enableFriend": true,
+  // 可选, 开启私聊回应
+  "errLogWay": 0
+  // 可选, 输出错误信息的途径, 0 - 输出到聊天环境, 1 - 输出到控制台
 }
 ```
+
 配置格式是json
 - apikey: 在Nasa申请的apikey, string类型, 在[这里](https://api.nasa.gov/index.html)申请, 只需要(虚假的)名字和邮箱
 - commandStatus: 可选, map<String, boolean>类型, key(第一项) 为API名字的一个(在下面:APOD/EARTH/EPIC/Mars...) 代表这个api是否启用, 比如 `{"EPIC":false}`, `#EPIC 2020-1-1` 就不会有任何作用(假设EPIC触发的词还是默认的`#EPIC`)

@@ -25,10 +25,16 @@ import tech.eritquearcus.nasaPlugin.*
 class Earth : CommandHandler {
     override suspend fun build(config: Config, data: List<String>, e: MessageEvent) {
         // commandName, lon, lat, date
-        if (data.size != 4) return
-        if (data[1].toFloatOrNull() == null || data[2].toFloatOrNull() == null) return
+        if (data.size != 4) {
+            errOut("参数数量不足, 需要传入lon, lat,经纬度和 date日期, 如: Earth 1.0 1.0 2022-01-01", e)
+            return
+        }
+        if (data[1].toFloatOrNull() == null || data[2].toFloatOrNull() == null) {
+            errOut("经纬度类型错误, 应为float", e)
+            return
+        }
         val date = getDate(data[3]) ?: let {
-            e.subject.sendMessage("日期格式错误, 需要符合yyy-MM-DD 如 2022-01-01")
+            errOut("日期格式错误, 需要符合yyy-MM-DD 如 2022-01-01", e)
             return
         }
         val re = request<EarthRe>(
@@ -47,9 +53,9 @@ class Earth : CommandHandler {
             """.trimIndent()
             }
             e.subject.sendMessage(msg)
-        }catch (e:Exception){
-            NasaPlugin.logger.error(e.message)
-            NasaPlugin.logger.error("Nasa返回" + gson.toJson(re))
+        } catch (exception: Exception) {
+            errOut(exception.message ?: "", e)
+            errOut("Nasa返回异常:" + gson.toJson(re), e)
         }
     }
 }

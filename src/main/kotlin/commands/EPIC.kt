@@ -22,15 +22,16 @@ import com.google.gson.JsonArray
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.buildForwardMessage
 import tech.eritquearcus.nasaPlugin.*
-import java.lang.Exception
 
 class EPIC : CommandHandler {
     override suspend fun build(config: Config, data: List<String>, e: MessageEvent) {
         // commandName, naturalDate
-        if (data.size != 2) return
-        val date = getDate(data[1])
-        if (date == null) {
-            e.subject.sendMessage("日期格式错误, 需要符合yyy-MM-DD 如 2022-01-01")
+        if (data.size != 2) {
+            errOut("参数数量不足, 应该传入 Date, 如: EPIC 2022-01-01", e)
+            return
+        }
+        val date = getDate(data[1]) ?: let {
+            errOut("日期格式错误, 需要符合yyy-MM-DD 如 2022-01-01", e)
             return
         }
         val re = request(config, "https://epic.gsfc.nasa.gov/api/natural/date/$date", mapOf())
@@ -48,14 +49,14 @@ class EPIC : CommandHandler {
                     }/png/" + info["image"].asString + ".png"
                 )
             )
-            val msg = buildForwardMessage(e.subject, CustomDisplayStrategy("Epic image")){
+            val msg = buildForwardMessage(e.subject, CustomDisplayStrategy("Epic image")) {
                 e.bot says img
                 e.bot says "介绍:" + info["caption"].asString
             }
             e.subject.sendMessage(msg)
-        }catch(e:Exception){
-            NasaPlugin.logger.error(e.message)
-            NasaPlugin.logger.error("Nasa返回$re")
+        } catch (exception: Exception) {
+            errOut(exception.message ?: "", e)
+            errOut("Nasa返回异常: $re", e)
         }
     }
 }

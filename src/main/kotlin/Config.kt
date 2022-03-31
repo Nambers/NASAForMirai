@@ -28,7 +28,8 @@ data class Config(
     val commandName: Map<String, String> = mapOf(),
     val commandStatus: Map<String, Boolean> = mapOf(),
     val enableFriend: Boolean = true,
-    val enableGroup: Boolean = true
+    val enableGroup: Boolean = true,
+    var errLogWay: Int = 0
 )
 
 enum class CommandType {

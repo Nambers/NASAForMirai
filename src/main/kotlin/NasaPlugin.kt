@@ -24,7 +24,14 @@ import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.event.globalEventChannel
-import java.lang.IllegalArgumentException
+
+internal suspend fun errOut(str: String, e: MessageEvent) {
+    if (str.isBlank()) return
+    when (NasaPlugin.config.errLogWay) {
+        0 -> e.subject.sendMessage("err: $str")
+        1 -> NasaPlugin.logger.error("err: $str")
+    }
+}
 
 private suspend fun handle(e: MessageEvent, config: Config) {
     val param = e.message.serializeToMiraiCode().split(" ")
@@ -45,6 +52,7 @@ object NasaPlugin : KotlinPlugin(
         author("Eritque arcus")
     }
 ) {
+    var config = Config("")
     override fun onEnable() {
         val configFile = this.resolveConfigFile("config.json")
         if (!configFile.exists()) {
@@ -52,11 +60,15 @@ object NasaPlugin : KotlinPlugin(
             configFile.writeText(gson.toJson(Config("apikey")))
             return
         }
-        val config = gson.fromJson(configFile.readText(), Config::class.java)
-        for(a in config.commandName){
+        config = gson.fromJson(configFile.readText(), Config::class.java)
+        if (config.errLogWay != 0 && config.errLogWay != 1) {
+            logger.error("errLogWay 错误, 应该为0 - 输出到聊天环境, 或者 1 - 输出到控制台, 自动改成0")
+            config.errLogWay = 0
+        }
+        for (a in config.commandName) {
             val b = try {
                 CommandType.valueOf(a.key)
-            }catch (_:IllegalArgumentException){
+            } catch (_: IllegalArgumentException) {
                 NasaPlugin.logger.error(a.key + "不是正确的参数, 可选参数有: " + CommandType.values().joinToString("/"))
                 continue
             }

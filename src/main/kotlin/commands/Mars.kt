@@ -27,17 +27,22 @@ import kotlin.random.Random
 class Mars : CommandHandler {
     override suspend fun build(config: Config, data: List<String>, e: MessageEvent) {
         // commandName, date, [camera]
-        if (data.size < 2 || data.size > 3) return
-        val date = getDate(data[1])
-        if (date == null) {
-            e.subject.sendMessage("日期格式错误, 需要符合yyy-MM-DD 如 2022-01-01")
+        if (data.size < 2 || data.size > 3) {
+            errOut("参数数量不足或多余, 应该传入一个或2个参数(date, [cameraName]), 比如: MARS 2022-01-01 或 MARS 2022-01-01 FNAZ", e)
+            return
+        }
+        val date = getDate(data[1]) ?: let {
+            errOut("日期格式错误, 需要符合yyy-MM-DD 如 2022-01-01", e)
             return
         }
         val map = if (data.size == 3) {
             val possibleCameraName =
                 listOf("FHAZ", "RHAZ", "MAST", "CHEMCAM", "MAHLI", "MARDI", "NAVCAM", "PANCAM", "MINITES")
             if (!possibleCameraName.contains(data[2])) {
-                e.subject.sendMessage("摄像机缩写名错误,可选缩写 " + possibleCameraName.joinToString(",") + " 对应含义见 https://api.nasa.gov/index.html#:~:text=named%20as%20follows%3A-,Rover%20Cameras,-Abbreviation")
+                errOut(
+                    "摄像机缩写名错误,可选缩写 " + possibleCameraName.joinToString(",") + " 对应含义见 https://api.nasa.gov/index.html#:~:text=named%20as%20follows%3A-,Rover%20Cameras,-Abbreviation",
+                    e
+                )
                 return
             }
             mapOf("earth_date" to date, "camera" to data[2])
@@ -60,9 +65,9 @@ class Mars : CommandHandler {
             """.trimMargin()
             }
             e.subject.sendMessage(msg)
-        } catch (e: Exception) {
-            NasaPlugin.logger.error(e.message)
-            NasaPlugin.logger.error("Nasa返回$re")
+        } catch (exception: Exception) {
+            errOut(exception.message ?: "", e)
+            errOut("Nasa返回异常: $re", e)
         }
     }
 }
